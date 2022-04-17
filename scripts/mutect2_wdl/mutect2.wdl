@@ -181,7 +181,7 @@ workflow Mutect2 {
     # logic about output file names -- these are the names *without* .vcf extensions
     String output_basename = basename(basename(tumor_reads, ".bam"),".cram")  #hacky way to strip either .bam or .cram
     String unfiltered_name = output_basename + "-unfiltered"
-    String filtered_name = output_basename + "-filtered"
+    String filtered_name = output_basename
     String funcotated_name = output_basename + "-funcotated"
 
     String output_vcf_name = output_basename + ".vcf"
