@@ -434,7 +434,7 @@ task SplitIntervals {
     }
 
     output {
-        Array[File] interval_files = glob("*.interval_list")
+        Array[File] interval_files = glob("*-scattered.intervals")
     }
 }
 
