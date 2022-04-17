@@ -420,7 +420,7 @@ task SplitIntervals {
             -scatter ~{scatter_count} \
             -O interval-files \
             ~{split_intervals_extra_args}
-        cp interval-files/*-scattered.intervals .
+        cp interval-files/*-scattered.interval_list .
     }
 
     runtime {
@@ -434,7 +434,7 @@ task SplitIntervals {
     }
 
     output {
-        Array[File] interval_files = glob("*-scattered.intervals")
+        Array[File] interval_files = glob("*-scattered.interval_list")
     }
 }
 
