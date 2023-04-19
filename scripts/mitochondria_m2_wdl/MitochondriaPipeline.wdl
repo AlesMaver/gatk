@@ -1,6 +1,7 @@
 version 1.0
 
 import "AlignAndCall.wdl" as AlignAndCall
+import "https://raw.githubusercontent.com/AlesMaver/bravo-pipeline/e79726c9b745cb13e9bb70a99f25cd414ca5658d/vcfPercentilesPreparation.wdl" as Bravo
 
 #import "https://api.firecloud.org/ga4gh/v1/tools/mitochondria:AlignAndCall/versions/23/plain-WDL/descriptor" as AlignAndCall
 
@@ -167,6 +168,19 @@ workflow MitochondriaPipeline {
       gatk_docker_override = gatk_docker_override,
       preemptible_tries = preemptible_tries
   }
+  
+  call FilterVCF {
+    input:
+      input_vcf = SplitMultiAllelicSites.split_vcf,
+      base_name = base_name
+  }
+
+  call Bravo.variantEffectPredictor {
+        input: chromosomeVCF = FilterVCF.output_vcf,
+            assembly = "GRCh38",
+            bufferSize = 100000,
+            referenceFasta = mt_fasta
+    }
 
   output {
     File subset_bam = SubsetBamToChrM.output_bam
@@ -402,4 +416,27 @@ task SplitMultiAllelicSites {
       disks: "local-disk 20 HDD"
       preemptible: select_first([preemptible_tries, 5])
   } 
+}
+
+task FilterVCF {
+  input {
+    File input_vcf
+    String base_name
+  }
+
+  String output_vcf = base_name + ".final.filtered.vcf"
+  
+  command {
+    bcftools view -i 'FILTER!~"weak_evidence"' ~{input_vcf} > ~{output_vcf}
+  }
+
+  runtime {
+    docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
+    requested_memory_mb_per_core: 4000
+    cpu: 2
+    runtime_minutes: 200
+  }
+  output {
+    File output_vcf = "~{output_vcf}" 
+  }
 }
