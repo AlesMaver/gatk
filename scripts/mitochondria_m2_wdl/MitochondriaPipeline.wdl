@@ -139,7 +139,9 @@ workflow MitochondriaPipeline {
       compress_output_vcf = compress_output_vcf,
       max_read_length = max_read_length,
       max_low_het_sites = max_low_het_sites,
-      preemptible_tries = preemptible_tries
+      preemptible_tries = preemptible_tries,
+      gnomad_mito_sites_vcf = gnomad_mito_sites_vcf,
+      gnomad_mito_sites_vcf_index = gnomad_mito_sites_vcf_index
   }
 
   # This is a temporary task to handle "joint calling" until Mutect2 can produce a GVCF.
