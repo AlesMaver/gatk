@@ -179,7 +179,7 @@ workflow MitochondriaPipeline {
       base_name = base_name
   }
 
-  call Bravo.variantEffectPredictor {
+  call variantEffectPredictor {
         input: chromosomeVCF = FilterVCF.output_vcf,
             assembly = "GRCh38",
             bufferSize = 100000,
