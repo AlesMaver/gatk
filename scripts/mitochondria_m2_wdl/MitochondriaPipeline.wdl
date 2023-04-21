@@ -440,3 +440,67 @@ task FilterVCF {
     File output_vcf = "~{output_vcf}" 
   }
 }
+
+task  variantEffectPredictor {
+    input {
+        File chromosomeVCF
+        String assembly
+        Int bufferSize
+        #File referenceDir
+        File referenceFasta
+        File gnomad_mito_sites_vcf
+        File gnomad_mito_sites_vcf_index
+        #File lofteeDir
+    }
+
+    command <<<
+        PERL5LIB=$PERL5LIB:/opt/vep/plugins/loftee/
+
+        vep -i ~{chromosomeVCF} \
+        --plugin LoF,loftee_path:/opt/vep/plugins/loftee/,human_ancestor_fa:/opt/vep/plugins/loftee/data/human_ancestor.fa.gz,conservation_file:/opt/vep/plugins/loftee/data/phylocsf_gerp.sql  \
+        --dir_cache /opt/vep/.vep/ \
+        --fasta ~{referenceFasta} \
+        --assembly ~{assembly} \
+        --cache \
+        --offline \
+        --vcf \
+        --sift b \
+        --polyphen b \
+        --ccds \
+        --uniprot \
+        --hgvs \
+        --symbol \
+        --numbers \
+        --domains \
+        --regulatory \
+        --canonical \
+        --protein \
+        --biotype \
+        --af \
+        --af_1kg \
+        --pubmed \
+        --shift_hgvs 0 \
+        --allele_number \
+        --format vcf \
+        --force \
+        --buffer_size ~{bufferSize} \
+        --compress_output bgzip \
+        --no_stats \
+        --fork 8 \
+        --dir_plugins /opt/vep/plugins/loftee/ \
+        --custom ~{gnomad_mito_sites_vcf},gnomADmito,vcf,exact,0,AC_het,AF_het,AC_hom,AF_hom \
+        -o variantEP.vcf.gz
+    >>>
+    output {
+        File out = "variantEP.vcf.gz"
+    }
+    runtime {
+        #docker: "ensemblorg/ensembl-vep:release_95.1"
+        #docker: "ensemblorg/ensembl-vep:release_106.1"
+        docker: "alesmaver/vep:testing"
+        cpu: "1"
+        bootDiskSizeGb: "150"
+    }
+
+}
+
