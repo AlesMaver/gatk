@@ -53,6 +53,10 @@ workflow MitochondriaPipeline {
 
     File control_region_shifted_reference_interval_list
     File non_control_region_interval_list
+    
+    # Annotation
+    File gnomad_mito_sites_vcf
+    File gnomad_mito_sites_vcf_index
 
     String? requester_pays_project
     File? gatk_override
